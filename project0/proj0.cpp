@@ -3,8 +3,9 @@
 #include <math.h>
 
 #define NUMT	         1	// number of threads to use -- do once for 1 and once for 4
-#define SIZE       	4	// array size -- you get to decide
+#define SIZE       	16384	// array size -- you get to decide
 #define NUMTRIES        20	// how many times to run the timing to get reliable timing data
+#define SPEEDUP         3.51    // speedup for 4 threads vs 1 thread
 
 float A[SIZE];
 float B[SIZE];
@@ -46,9 +47,11 @@ main( )
                 if( megaMults > maxMegaMults )
                         maxMegaMults = megaMults;
         }
+        float Fp = (4./3.) * (1. - (1./SPEEDUP));
 
         fprintf( stderr, "For %d threads, Peak Performance = %8.2lf MegaMults/Sec\n", NUMT, maxMegaMults );
-
+        
+        fprintf( stderr, "Parallel Fraction = %8.2lf\n", Fp );
 	// note: %lf stands for "long float", which is how printf prints a "double"
 	//        %d stands for "decimal integer", not "double"
 
