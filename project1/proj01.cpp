@@ -6,7 +6,7 @@
 #include <omp.h>
 
 #ifndef NUMT
-#define NUMT 2
+#define NUMT 8
 #endif
 
 // Increased trials to 500,000 for better probability resolution
@@ -70,7 +70,7 @@ int main( int argc, char *argv[ ] ) {
         double time0 = omp_get_wtime();
         numSuccesses = 0;
 
-        #pragma ??????
+        #pragma omp parallel for reduction(+: numSuccesses)
         for( int n = 0; n < NUMTRIALS; n++ ) {
             float u1 = U1[n];
             float u2 = U2[n];
@@ -85,12 +85,12 @@ int main( int argc, char *argv[ ] ) {
             float simulated_day = MEAN_SNOW_DAY + ( z0 * STD_DEV );
             
             // Skip this simulation if the simulated day is outside of historic limits
-            if( ?????? ) {
+            if( simulated_day < EARLIEST_HISTORICAL_DAY || simulated_day > LATEST_HISTORICAL_DAY ) {
                 continue; // Skips to the next iteration without counting it as a success
             }
 
             // Did the first snow fall exactly on our target day?
-            if( ???? ) {
+            if( simulated_day >= TARGET_DAY && simulated_day < TARGET_DAY + 1 ) {
                 numSuccesses++;
             }
         }
