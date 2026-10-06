@@ -70,7 +70,8 @@ int main( int argc, char *argv[ ] ) {
         double time0 = omp_get_wtime();
         numSuccesses = 0;
 
-        #pragma omp parallel for reduction(+: numSuccesses)
+        // #pragma omp parallel for reduction(+: numSuccesses)
+        #pragma omp parallel for default(none) shared(U1, U2, MEAN_SNOW_DAY, STD_DEV, LATEST_HISTORICAL_DAY, TARGET_DAY) reduction(+: numSuccesses)
         for( int n = 0; n < NUMTRIALS; n++ ) {
             float u1 = U1[n];
             float u2 = U2[n];
