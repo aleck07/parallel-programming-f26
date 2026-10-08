@@ -64,6 +64,7 @@ float	NowPrecip;		// inches of rain per month
 float	NowTemp;		// temperature this month
 float	NowHeight;		// grain height in inches
 int	NowNumDeer;		// number of deer in the current population
+int NowNumAliens;   // number of aliens in the current population
 
 
 const float GRAIN_GROWS_PER_MONTH =	       12.0;
@@ -79,6 +80,9 @@ const float RANDOM_TEMP =			10.0;	// plus or minus noise
 
 const float MIDTEMP =				40.0;
 const float MIDPRECIP =				10.0;
+
+const float ALIEN_GROWS_PER_MONTH = 5.0;
+const float ONE_ALIEN_EATS_PER_MONTH = 2.0; // In this similation aliens eat deer
 
 void Watcher()
 {
@@ -128,7 +132,7 @@ void Deer()
                 nextNumDeer = 0;
         WaitBarrier(); // 1.
         // Copy the computed next state to the Now state
-        ???
+        NowNumDeer = nextNumDeer;
         WaitBarrier(); // 2.
         // // Do nothing
         WaitBarrier(); // 3.
@@ -152,9 +156,28 @@ void Grain()
         }
         WaitBarrier(); // 1.
         // Copy the computed next state to the Now state
-        ???
+        NowHeight = nextHeight;
         WaitBarrier(); // 2.
         // Do nothing
+        WaitBarrier(); // 3.
+    }
+}
+
+void Alien()
+{
+    while (NowYear < 2030 && NowYear >= 2025) // Aliens invade in 2025
+    {
+        int nextNumAliens = NowNumAliens;
+        int deerCapacity = (int)( NowNumDeer );
+        if (nextNumAliens < deerCapacity)
+            nextNumAliens++;
+        else if (nextNumAliens > deerCapacity)
+            nextNumAliens--;
+        if (nextNumAliens < 0)
+            nextNumAliens = 0;
+        WaitBarrier(); // 1.
+        NowNumAliens = nextNumAliens;
+        WaitBarrier(); // 2.
         WaitBarrier(); // 3.
     }
 }
