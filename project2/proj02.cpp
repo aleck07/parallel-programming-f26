@@ -7,7 +7,7 @@
 #include <omp.h>
 
 //Use this to disable barriers and compare to proper thread synchronization
-//#define DISABLE_BARRIERS
+// #define DISABLE_BARRIERS
 
 omp_lock_t Lock;
 volatile int NumInThreadTeam;
@@ -66,6 +66,7 @@ float	NowHeight;		// grain height in inches
 int	NowNumDeer;		// number of deer in the current population
 int NowNumAliens;   // number of aliens in the current population
 
+const int END_YEAR = 2034;
 
 const float GRAIN_GROWS_PER_MONTH =	       12.0;
 const float ONE_DEER_EATS_PER_MONTH =		1.0;
@@ -81,19 +82,18 @@ const float RANDOM_TEMP =			10.0;	// plus or minus noise
 const float MIDTEMP =				40.0;
 const float MIDPRECIP =				10.0;
 
-const float ALIEN_GROWS_PER_MONTH = 5.0;
 const float ONE_ALIEN_EATS_PER_MONTH = 2.0; // In this similation aliens eat deer
 
 void Watcher()
 {
-    while (NowYear < 2030)
+    while (NowYear < END_YEAR)
     {
         // do nothing
         WaitBarrier(); // 1.
         // do nothing
         WaitBarrier(); // 2.
         //<< write out the â€œNowâ€ state of data >>
-        printf("%d, %d, %f, %f, %d, %d\n", NowYear, NowMonth, NowPrecip, NowHeight, NowNumDeer);
+        printf("%d, %d, %f, %f, %d, %d\n", NowYear, NowMonth, NowPrecip, NowHeight, NowNumDeer, NowNumAliens);
         // Advance time
         NowMonth++;
         if (NowMonth > 11)
@@ -119,7 +119,7 @@ void Watcher()
 
 void Deer()
 {
-    while (NowYear < 2030)
+    while (NowYear < END_YEAR)
     {
         int nextNumDeer = NowNumDeer;
         int carryingCapacity = (int)( NowHeight );
@@ -141,7 +141,7 @@ void Deer()
 
 void Grain()
 {
-    while (NowYear < 2030)
+    while (NowYear < END_YEAR)
     {
         // Compute next state
         float tempFactor = exp(-Sqr((NowTemp - MIDTEMP) / 10.));
@@ -165,12 +165,12 @@ void Grain()
 
 void Alien()
 {
-    while (NowYear < 2030 && NowYear >= 2025) // Aliens invade in 2025
+    while (NowYear < END_YEAR) // Aliens invade in 2025
     {
         int nextNumAliens = NowNumAliens;
         int deerCapacity = (int)( NowNumDeer );
         if (nextNumAliens < deerCapacity)
-            nextNumAliens++;
+            nextNumAliens = (int)deerCapacity/2;
         else if (nextNumAliens > deerCapacity)
             nextNumAliens--;
         if (nextNumAliens < 0)
@@ -184,7 +184,7 @@ void Alien()
 
 int main(int argc, char *argv[])
 {
-    printf("Year, Month, Precipitation, Grain Height, Num Deer\n");
+    printf("Year, Month, Precipitation, Grain Height, Num Deer, Num Alien\n");
 
     // starting date and time:
     NowMonth =    0;
@@ -193,6 +193,7 @@ int main(int argc, char *argv[])
     // starting state (feel free to change this if you want):
     NowNumDeer = 2;
     NowHeight =  5.;
+    NowNumAliens = 1;
 
     InitBarrier(4);
     omp_set_num_threads(4); // same as # of sections
@@ -215,7 +216,7 @@ int main(int argc, char *argv[])
 
 #pragma omp section
         {
-            ???(); // your own
+            Alien();
         }
     } // implied barrier -- all functions must return in order
       // to allow any of them to get past here
