@@ -93,7 +93,7 @@ void Watcher()
         // do nothing
         WaitBarrier(); // 2.
         //<< write out the â€œNowâ€ state of data >>
-        printf("%d, %d, %f, %f, %d, %d\n", NowYear, NowMonth, NowPrecip, NowHeight, NowNumDeer, NowNumAliens);
+        printf("%d, %d, %f, %f, %f, %d, %d\n", NowYear, NowMonth, NowPrecip, NowTemp, NowHeight, NowNumDeer, NowNumAliens);
         // Advance time
         NowMonth++;
         if (NowMonth > 11)
@@ -189,7 +189,7 @@ void Alien()
 
 int main(int argc, char *argv[])
 {
-    printf("Year, Month, Precipitation, Grain Height, Num Deer, Num Alien\n");
+    printf("Year, Month, Precipitation, Temperature, Grain Height, Num Deer, Num Alien\n");
 
     // starting date and time:
     NowMonth =    0;
