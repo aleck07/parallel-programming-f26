@@ -170,7 +170,7 @@ void Alien()
         int nextNumAliens = NowNumAliens;
         int deerCapacity = (int)( NowNumDeer );
         if (nextNumAliens < deerCapacity)
-            nextNumAliens = (int)deerCapacity/2;
+            nextNumAliens = (int)deerCapacity/2; // Every 2 deer gives 1 alien.
         else if (nextNumAliens > deerCapacity)
             nextNumAliens--;
         if (nextNumAliens < 0)
