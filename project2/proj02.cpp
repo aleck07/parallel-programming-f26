@@ -66,12 +66,12 @@ float	NowHeight;		// grain height in inches
 int	NowNumDeer;		// number of deer in the current population
 int NowNumAliens;   // number of aliens in the current population
 
-const int END_YEAR = 2034;
+const int END_YEAR = 2032;
 
-const float GRAIN_GROWS_PER_MONTH =	       12.0;
+const float GRAIN_GROWS_PER_MONTH =	       12.0; // inches, default 12
 const float ONE_DEER_EATS_PER_MONTH =		1.0;
 
-const float AVG_PRECIP_PER_MONTH =		7.0;	// average
+const float AVG_PRECIP_PER_MONTH =		10.0;	// average
 const float AMP_PRECIP_PER_MONTH =		6.0;	// plus or minus
 const float RANDOM_PRECIP =			2.0;	// plus or minus noise
 
@@ -82,7 +82,7 @@ const float RANDOM_TEMP =			10.0;	// plus or minus noise
 const float MIDTEMP =				40.0;
 const float MIDPRECIP =				10.0;
 
-const float ONE_ALIEN_EATS_PER_MONTH = 2.0; // In this similation aliens eat deer
+const float ONE_ALIEN_EATS_PER_MONTH = 1.0; // In this similation aliens eat deer
 
 void Watcher()
 {
@@ -123,11 +123,16 @@ void Deer()
     {
         int nextNumDeer = NowNumDeer;
         int carryingCapacity = (int)( NowHeight );
-        if( nextNumDeer < carryingCapacity )
+        if( nextNumDeer < carryingCapacity ) {  // When theres lots of grain, more deer can be created
+            if (carryingCapacity > 2 * nextNumDeer)
+                nextNumDeer += 2;
+            else
                 nextNumDeer++;
+        }
         else
         if( nextNumDeer > carryingCapacity )
                 nextNumDeer--;
+        nextNumDeer -= (int)(NowNumAliens * ONE_ALIEN_EATS_PER_MONTH);
         if( nextNumDeer < 0 )
                 nextNumDeer = 0;
         WaitBarrier(); // 1.
@@ -168,10 +173,10 @@ void Alien()
     while (NowYear < END_YEAR) // Aliens invade in 2025
     {
         int nextNumAliens = NowNumAliens;
-        int deerCapacity = (int)( NowNumDeer );
-        if (nextNumAliens < deerCapacity)
-            nextNumAliens = (int)deerCapacity/2; // Every 2 deer gives 1 alien.
-        else if (nextNumAliens > deerCapacity)
+        int alienCapacity = NowNumDeer / 3; // 3 deer per alien
+        if (nextNumAliens < alienCapacity)
+            nextNumAliens++;
+        else if (nextNumAliens > alienCapacity)
             nextNumAliens--;
         if (nextNumAliens < 0)
             nextNumAliens = 0;
