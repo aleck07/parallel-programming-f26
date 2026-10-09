@@ -83,6 +83,8 @@ const float MIDTEMP =				40.0;
 const float MIDPRECIP =				10.0;
 
 const float ONE_ALIEN_EATS_PER_MONTH = 1.0; // In this similation aliens eat deer
+const float INVASION_CHANCE = 0.1;
+const float INVASION_AMOUNT = 3;
 
 void Watcher()
 {
@@ -178,6 +180,9 @@ void Alien()
             nextNumAliens++;
         else if (nextNumAliens > alienCapacity)
             nextNumAliens--;
+        //Alien invasion 
+        if(Ranf(0., 1.) < INVASION_CHANCE)
+            nextNumAliens += INVASION_AMOUNT;
         if (nextNumAliens < 0)
             nextNumAliens = 0;
         WaitBarrier(); // 1.
