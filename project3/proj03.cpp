@@ -67,7 +67,7 @@ int
 main( int argc, char *argv[ ] )
 {
 #ifdef _OPENMP
-	fprintf( stderr, "OpenMP is supported -- version = %d\n", _OPENMP );
+	// fprintf( stderr, "OpenMP is supported -- version = %d\n", _OPENMP );
 #else
         fprintf( stderr, "No OpenMP support!\n" );
         return 1;
@@ -115,9 +115,9 @@ main( int argc, char *argv[ ] )
 				float dist = Distance( i, k );
 				if( dist < mindistance )
 				{
-					??????
-					??????
-					??????
+					mindistance = dist;
+					capitalnumber = k;
+					Cities[i].capitalnumber = k;
 				}
 			}
 
@@ -136,8 +136,8 @@ main( int argc, char *argv[ ] )
 		// get the average longitude and latitude for each capital:
 		for( int k = 0; k < NUMCAPITALS; k++ )
 		{
-			Capitals[k].longitude = ?????
-			Capitals[k].latitude  = ?????
+			Capitals[k].longitude = Capitals[k].longsum / (float)Capitals[k].numsum;
+			Capitals[k].latitude  = Capitals[k].latsum  / (float)Capitals[k].numsum;
 		}
 	}
 
@@ -148,7 +148,17 @@ main( int argc, char *argv[ ] )
 	// this is the extra credit:
 	for( int k = 0; k < NUMCAPITALS; k++ )
 	{
-		?????
+		int closestCity = -1;
+		float closestCityDistance = 1.e+37;
+
+		for (int i = 0; i < NUMCITIES; i++) {
+			float dist = Distance(i, k);
+			if (dist < closestCityDistance) {
+				closestCityDistance = dist;
+				closestCity = i;
+			}
+		}
+		Capitals[k].name = Cities[closestCity].name;
 	}
 
 
@@ -158,10 +168,10 @@ main( int argc, char *argv[ ] )
 	{
 		for( int k = 0; k < NUMCAPITALS; k++ )
 		{
-			fprintf( stderr, "\t%3d:  %8.2f , %8.2f\n", k, Capitals[k].longitude, Capitals[k].latitude );
+			// fprintf( stderr, "\t%3d:  %8.2f , %8.2f\n", k, Capitals[k].longitude, Capitals[k].latitude );
 
 			//if you did the extra credit, use this fprintf instead:
-			//fprintf( stderr, "\t%3d:  %8.2f , %8.2f , %s\n", k, Capitals[k].longitude, Capitals[k].latitude, Capitals[k].name.c_str() );
+			fprintf( stderr, "\t%3d:  %8.2f , %8.2f , %s\n", k, Capitals[k].longitude, Capitals[k].latitude, Capitals[k].name.c_str() );
 		}
 	}
 #ifdef CSV
