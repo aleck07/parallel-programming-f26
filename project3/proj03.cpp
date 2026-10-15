@@ -104,6 +104,7 @@ main( int argc, char *argv[ ] )
 		time0 = omp_get_wtime( );
 
         	// the #pragma goes here -- you figure out what it needs to look like:
+		#pragma omp parallel for default(none) shared(Cities, Capitals)
 		for( int i = 0; i < NUMCITIES; i++ )
 		{
 			int capitalnumber = -1;
@@ -114,9 +115,9 @@ main( int argc, char *argv[ ] )
 				float dist = Distance( i, k );
 				if( dist < mindistance )
 				{
-					?????
-					?????
-					?????
+					??????
+					??????
+					??????
 				}
 			}
 
