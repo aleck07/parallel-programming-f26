@@ -86,8 +86,8 @@ MonteCarlo( IN float* dU1, IN float* dU2, OUT int* dsuccesses)
 	dsuccesses[gid] = 0;
 
         // Load this threads u1 and u2
-	float u1 = ??????;
-	float u2 = ??????;
+	float u1 = dU1[gid];
+	float u2 = dU2[gid];
 
 	// Prevent log(0) in the equation
 	if( u1 == 0.f ) u1 = 0.0001f;
@@ -100,7 +100,10 @@ MonteCarlo( IN float* dU1, IN float* dU2, OUT int* dsuccesses)
 	
 	// Determine if this simulated snow day is at or before our target day taking the historical limits into account
         // dsuccesses[gid] is your output for this thread's simulated day.
-        ??????
+	if (floor(simulated_day) <= TARGET_DAY && floor(simulated_day) >= EARLIEST_HISTORICAL_DAY)
+	{
+		dsuccesses[gid] = 1;
+	}
 }
 
 int
@@ -126,8 +129,8 @@ main(int argc, char* argv[])
 	CudaCheckError();
 
 	// copy host memory for U1 and U2 to the device:
-	cudaMemcpy(????????????????);
-	cudaMemcpy(????????????????);
+	cudaMemcpy(dU1, hU1, NUMTRIALS * sizeof(float), cudaMemcpyHostToDevice);
+	cudaMemcpy(dU2, hU2, NUMTRIALS * sizeof(float), cudaMemcpyHostToDevice);
 
 	CudaCheckError();
 
