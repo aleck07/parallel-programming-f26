@@ -101,10 +101,15 @@ MonteCarlo( IN float* dU1, IN float* dU2, OUT int* dsuccesses)
 	// Determine if this simulated snow day is at or before our target day taking the historical limits into account
         // dsuccesses[gid] is your output for this thread's simulated day.
 	int simulated_day_int = (int)floor(simulated_day);
-	if (simulated_day_int <= TARGET_DAY && simulated_day_int >= EARLIEST_HISTORICAL_DAY && simulated_day_int <= LATEST_HISTORICAL_DAY) // we dont need the latest historical day, but including it to avoid the unusued variable warnings
-	{
-		dsuccesses[gid] = 1;
-	}
+	// Causes branch divergence
+	// if (simulated_day_int <= TARGET_DAY && simulated_day_int >= EARLIEST_HISTORICAL_DAY && simulated_day_int <= LATEST_HISTORICAL_DAY) // we dont need the latest historical day, but including it to avoid the unusued variable warnings
+	// {
+	// 	dsuccesses[gid] = 1;
+	// }
+
+	// The if statement above causes a branch divergence. Use:
+	int success = ((simulated_day_int <= TARGET_DAY) & (simulated_day_int >= EARLIEST_HISTORICAL_DAY));
+	dsuccesses[gid] = success;
 }
 
 int
