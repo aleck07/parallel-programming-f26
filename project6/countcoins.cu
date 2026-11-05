@@ -258,7 +258,33 @@ device_count_coins( IN unsigned char* device_image,
     //} else {
     //   device_count_per_block[block_id] = 0;
     //}
+    int offsetX = coin_width/2 - SAD_SIZE_X/2;
+    int offsetY = coin_height/2 - SAD_SIZE_Y/2;
+    int coinX = offsetX + threadIdx.x;
+    int coinY = offsetY + threadIdx.y;
+    int imageX = blockIdx.x * coin_width + coinX;
+    int imageY = blockIdx.y * coin_height + coinY;
+    SAD_block[thread_id] = abs(device_image[imageY * image_width + imageX] - device_coin[coinY * coin_width + coinX]);
+    
+    __syncthreads();
 
+    int SAD = 0;
+    if (thread_id == 0)
+    {
+        for (int i = 0; i < SAD_SIZE_X * SAD_SIZE_Y; i++)
+        {
+            SAD += SAD_block[i];
+        }
+
+        if (SAD < CORRELATION_THRESHOLD)
+        {
+            device_count_per_block[block_id] = 1;
+        }
+        else
+        {
+            device_count_per_block[block_id] = 0;
+        }
+    }
 }
 
 // Buffer allocation is 'expensive' in time.  Do this once before we start timing for performance
