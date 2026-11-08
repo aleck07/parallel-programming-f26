@@ -18,14 +18,14 @@
 #define SAD_SIZE_Y (THREAD_GRID_Y)
 
 // If defined, count with the GPU vs CPU
-//#define GPU
+#define GPU
 
 // Enable the bounding box image feature for debugging purposes.  
 // Will make your program slower
 //#define BOUNDS_IMAGE
 
 // Output data in CSV format
-//#define CSV
+#define CSV
 
 // Number of CPU threads to use in CPU implementation
 #define NUM_CPU_THREADS 4
@@ -268,15 +268,25 @@ device_count_coins( IN unsigned char* device_image,
     
     __syncthreads();
 
-    int SAD = 0;
+    // Tree Reduction
+    unsigned int num_values = SAD_SIZE_X * SAD_SIZE_Y;
+    unsigned int stride = num_values / 2;
+
+    while (stride > 0)
+    {
+        if (thread_id < stride)
+        {
+            SAD_block[thread_id] = SAD_block[thread_id] + SAD_block[thread_id + stride];
+        }
+        __syncthreads();
+        stride = stride / 2;
+    }
+
     if (thread_id == 0)
     {
-        for (int i = 0; i < SAD_SIZE_X * SAD_SIZE_Y; i++)
-        {
-            SAD += SAD_block[i];
-        }
+        unsigned int total_SAD = SAD_block[0];
 
-        if (SAD < CORRELATION_THRESHOLD)
+        if (total_SAD < CORRELATION_THRESHOLD)
         {
             device_count_per_block[block_id] = 1;
         }
