@@ -258,12 +258,35 @@ device_count_coins( IN unsigned char* device_image,
     //} else {
     //   device_count_per_block[block_id] = 0;
     //}
+    const int minOffset = -26;
+    const int maxOffset = 26;
     int offsetX = coin_width/2 - SAD_SIZE_X/2;
     int offsetY = coin_height/2 - SAD_SIZE_Y/2;
     int coinX = offsetX + threadIdx.x;
     int coinY = offsetY + threadIdx.y;
     int imageX = blockIdx.x * coin_width + coinX;
     int imageY = blockIdx.y * coin_height + coinY;
+
+    for (let i = minOffset; i <= maxOffset; i++)
+    {
+        for (let j = minOffset; j <= maxOffset; j++)
+        {
+            int shiftedCoinX = coinX + j;
+            int shiftedCoinY = coinY + i;
+            int shiftedImageX = imageX + j;
+            int shiftedImageY = imageY + i;
+
+            if (shiftedCoinX >= 0 && shiftedCoinX < coin_width &&
+                shiftedCoinY >= 0 && shiftedCoinY < coin_height &&
+                shiftedImageX >= 0 && shiftedImageX < image_width &&
+                shiftedImageY >= 0 && shiftedImageY < image_height)
+            {
+                SAD_block[thread_id] += abs(device_image[shiftedImageY * image_width + shiftedImageX] - device_coin[shiftedCoinY * coin_width + shiftedCoinX]);
+            }
+        }
+    }
+
+    // SAD calculation
     SAD_block[thread_id] = abs(device_image[imageY * image_width + imageX] - device_coin[coinY * coin_width + coinX]);
     
     __syncthreads();
