@@ -266,10 +266,10 @@ device_count_coins( IN unsigned char* device_image,
     int coinY = offsetY + threadIdx.y;
     int imageX = blockIdx.x * coin_width + coinX;
     int imageY = blockIdx.y * coin_height + coinY;
-
-    for (let i = minOffset; i <= maxOffset; i++)
+    // SAD calculation
+    for (int i = minOffset; i <= maxOffset; i++)
     {
-        for (let j = minOffset; j <= maxOffset; j++)
+        for (int j = minOffset; j <= maxOffset; j++)
         {
             int shiftedCoinX = coinX + j;
             int shiftedCoinY = coinY + i;
@@ -281,13 +281,10 @@ device_count_coins( IN unsigned char* device_image,
                 shiftedImageX >= 0 && shiftedImageX < image_width &&
                 shiftedImageY >= 0 && shiftedImageY < image_height)
             {
-                SAD_block[thread_id] += abs(device_image[shiftedImageY * image_width + shiftedImageX] - device_coin[shiftedCoinY * coin_width + shiftedCoinX]);
+                SAD_block[thread_id] = abs(device_image[shiftedImageY * image_width + shiftedImageX] - device_coin[shiftedCoinY * coin_width + shiftedCoinX]);
             }
         }
     }
-
-    // SAD calculation
-    SAD_block[thread_id] = abs(device_image[imageY * image_width + imageX] - device_coin[coinY * coin_width + coinX]);
     
     __syncthreads();
 
@@ -301,7 +298,9 @@ device_count_coins( IN unsigned char* device_image,
         {
             SAD_block[thread_id] = SAD_block[thread_id] + SAD_block[thread_id + stride];
         }
-        __syncthreads();
+        if (stride - 16 <= 16){
+            __syncthreads();
+        }
         stride = stride / 2;
     }
 
